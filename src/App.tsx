@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Terminal, Sparkles } from 'lucide-react';
+import { Terminal } from 'lucide-react';
 import HeartScene from './HeartScene';
 
 const Typewriter = ({ lines, delay = 30, onComplete }: { lines: string[], delay?: number, onComplete?: () => void }) => {
@@ -26,7 +26,7 @@ const Typewriter = ({ lines, delay = 30, onComplete }: { lines: string[], delay?
             return newLines;
           });
           setCurrentCharIndex(prev => prev + 1);
-        }, delay + Math.random() * 20); // random variation for hacker feel
+        }, delay + Math.random() * 20);
         return () => clearTimeout(timeout);
       } else {
         const lineDelay = setTimeout(() => {
@@ -66,8 +66,8 @@ const LoadingSequence = ({ onComplete }: { onComplete: () => void }) => {
   ];
 
   useEffect(() => {
-    const totalDuration = 1800; // 1.8 seconds
-    const intervalTime = 20; // Update every 20ms
+    const totalDuration = 1800;
+    const intervalTime = 20;
     const steps = totalDuration / intervalTime;
     let currentStep = 0;
 
@@ -76,7 +76,6 @@ const LoadingSequence = ({ onComplete }: { onComplete: () => void }) => {
       const currentProgress = Math.min(Math.floor((currentStep / steps) * 100), 100);
       setProgress(currentProgress);
       
-      // Update logs rapidly
       if (currentStep % 10 === 0) {
         setLogIndex((prev) => Math.min(prev + 1, logs.length - 1));
       }
@@ -131,7 +130,7 @@ const LoadingSequence = ({ onComplete }: { onComplete: () => void }) => {
 };
 
 const CountdownSequence = ({ onComplete }: { onComplete: () => void }) => {
-  const TARGET_DATE = new Date('2026-06-23T00:00:00').getTime();
+  const TARGET_DATE = useMemo(() => new Date('2026-06-23T00:00:00').getTime(), []);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [isPassed, setIsPassed] = useState(false);
 
@@ -208,7 +207,7 @@ const CountdownSequence = ({ onComplete }: { onComplete: () => void }) => {
                 e.stopPropagation();
                 onComplete();
               }}
-              className="group relative flex flex-wrap items-center justify-center gap-3 px-8 py-4 bg-transparent border-2 border-pink-deep hover:bg-pink-deep/20 transition-all duration-300 overflow-hidden pointer-events-auto rounded-sm backdrop-blur-sm shadow-[0_0_15px_rgba(255,77,109,0.3)] hover:shadow-[0_0_25px_rgba(255,77,109,0.5)]"
+              className="group relative flex flex-wrap items-center justify-center gap-3 px-8 py-4 bg-transparent border-2 border-pink-deep hover:bg-pink-deep/20 transition-all duration-300 overflow-hidden pointer-events-auto rounded-sm backdrop-blur-sm shadow-[0_0_15px_rgba(255,77,109,0.3)] hover:shadow-[0_0_25px_rgba(255,77,109,0.5)] cursor-pointer"
             >
                <div className="absolute inset-0 bg-pink-deep opacity-0 group-hover:opacity-20 transition-opacity"></div>
                <span className="relative z-10 flex items-center justify-center w-full gap-3 text-sm sm:text-base font-bold tracking-[0.2em] text-pink-deep group-hover:text-white transition-colors duration-300">
@@ -216,15 +215,9 @@ const CountdownSequence = ({ onComplete }: { onComplete: () => void }) => {
                </span>
             </button>
           ) : (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onComplete();
-              }}
-              className="text-xs sm:text-sm tracking-[0.2em] opacity-40 hover:opacity-100 hover:text-white transition-opacity uppercase text-pink-soft"
-            >
-              [ BYPASS_TEMPORAL_LOCK ]
-            </button>
+            <span className="text-xs sm:text-sm tracking-[0.2em] opacity-40 uppercase text-pink-soft select-none">
+              [ TEMPORAL_LOCK_ENGAGED // ACCESS_DENIED ]
+            </span>
           )}
         </div>
       </div>
@@ -242,7 +235,7 @@ export default function App() {
       className="relative min-h-screen w-full flex flex-col items-center justify-center bg-[#050505] text-pink-soft font-mono selection:bg-brand-red/30 overflow-hidden"
     >
       <div className="scanline" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))]from-pink-soft/10 via-transparent to-transparent opacity-30 pointer-events-none z-0"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-pink-soft/10 via-transparent to-transparent opacity-30 pointer-events-none z-0"></div>
       
       <AnimatePresence mode="wait">
         {stage === 'countdown' && (
@@ -295,7 +288,7 @@ export default function App() {
                       e.stopPropagation();
                       setStage('loading');
                     }}
-                    className="group relative flex flex-wrap items-center justify-center gap-3 px-8 py-4 bg-transparent border-2 border-pink-deep hover:bg-pink-deep/20 transition-all duration-300 overflow-hidden pointer-events-auto rounded-sm backdrop-blur-sm shadow-[0_0_15px_rgba(255,77,109,0.3)] hover:shadow-[0_0_25px_rgba(255,77,109,0.5)]"
+                    className="group relative flex flex-wrap items-center justify-center gap-3 px-8 py-4 bg-transparent border-2 border-pink-deep hover:bg-pink-deep/20 transition-all duration-300 overflow-hidden pointer-events-auto rounded-sm backdrop-blur-sm shadow-[0_0_15px_rgba(255,77,109,0.3)] hover:shadow-[0_0_25px_rgba(255,77,109,0.5)] cursor-pointer"
                   >
                     <div className="absolute inset-0 bg-pink-deep opacity-0 group-hover:opacity-20 transition-opacity"></div>
                     <span className="relative flex items-center gap-3 text-sm sm:text-base font-bold tracking-[0.2em] group-hover:text-white text-pink-soft">
@@ -417,7 +410,7 @@ export default function App() {
                     e.stopPropagation();
                     setStage('console');
                   }}
-                  className="text-pink-soft hover:text-white px-3 py-1 transition-all uppercase text-[10px] sm:text-xs tracking-widest font-mono flex items-center justify-center gap-2 w-full h-full"
+                  className="text-pink-soft hover:text-white px-3 py-1 transition-all uppercase text-[10px] sm:text-xs tracking-widest font-mono flex items-center justify-center gap-2 w-full h-full cursor-pointer"
                 >
                   <Terminal size={12} />
                   <span>[Revert]</span>
